@@ -1,0 +1,35 @@
+<!-- views/campgrounds/new.ejs -->
+<% layout('layouts/boilerplate') %>
+    <div class="row">
+        <h1 class="text-center">New Campground</h1>
+        <div class="col-6 offset-3">
+            <form action="/make-campgrounds" method="POST">
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" type="text" id="title" name="Campground[title]" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="location">Location</label>
+                    <input class="form-control" type="text" id="location" name="Campground[location]" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="images">Image Url</label>
+                    <input class="form-control" type="text" id="images" name="Campground[images]" required></input>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="price">Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="price">Rp.</span>
+                        <input type="number" class="form-control" id="price" name="Campground[price]" placeholder="0.00"
+                            aria-label="price" aria-describedby="price-label">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" id="description" name="Campground[description]" required></textarea>
+                </div>
+                <button class="btn btn-success mb-3">Add Campground</button>
+            </form>
+            <a href="/index">All Campground</a>
+        </div>
+    </div>
