@@ -1,0 +1,102 @@
+//: Mengimport library express yang digunakan untuk membangun aplikasi web dengan Node.js.
+const express = require('express')
+//: Mengimport library path yang digunakan untuk memanipulasi path file/directory.
+const path = require('path')
+//: Mengimport library mongoose yang digunakan untuk berinteraksi dengan database MongoDB menggunakan Object Data Modeling (ODM)
+const mongoose = require('mongoose')
+//: Membuat instance dari aplikasi express.
+const app = express()
+//: Mengimport model Campground dari file campground.js yang berisi definisi schema dan model untuk data Campground.
+const Campground = require('./models/campground')
+//: Mengimport library method-override yang digunakan untuk mengubah method HTTP yang digunakan dalam sebuah request.
+const methodOverride = require('method-override')
+//: Mengimport library ejs-mate yang digunakan sebagai engine untuk view template engine ejs.
+const ejsMate = require('ejs-mate')
+//: Mengimport middleware catchAsync yang digunakan untuk menangani error pada async function.
+const catchAsync = require('./utils/catchAsync')
+//: Mengimport class ExpressError yang digunakan untuk menangani error pada aplikasi Express.
+const ExpressError = require('./utils/ExpressError')
+//: Mengimport schema untuk Campground dan Review dari file schemas.js.
+const { campgroundSchema, reviewSchema } = require('./schemas.js')
+//: Mengimport model Review dari file review.js yang berisi definisi schema dan model untuk data Review.
+const Review = require('./models/review')
+//import router
+const campgrounds = require('./routes/campground');
+const reviews = require('./routes/review');
+//seassion( npm i express-session )
+const session = require('express-session');
+//flash( npm i connect-flash )
+const flash = require('connect-flash');
+//npm i multer
+const multer = require('multer');
+//npm i cloudinary
+const { cloudinary, storage } = require('./cloudinary');
+const upload = multer({ storage });
+//npm install @mapbox/mapbox-sdk
+const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
+//npm i passport
+//passport
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
+
+//app.use(methodOverride('_method')) adalah sebuah middleware pada aplikasi Express yang mengaktifkan penggunaan HTTP method override untuk mengirim HTTP request selain GET dan POST. Hal ini memungkinkan kita untuk mengirimkan request dengan metode seperti PUT, DELETE, dan PATCH melalui form HTML biasa dengan menambahkan input field _method yang berisi nilai metode HTTP yang diinginkan. Middleware ini mengambil nilai _method dari request body dan mengubah metode HTTP request yang diterima sebelum melewatkan request tersebut ke handler yang sesuai.
+app.use(methodOverride('_method'));
+
+//automation find directory public
+app.use(express.static(path.join(__dirname, '/public')));
+
+//connecting to mongoose
+const url = 'mongodb://127.0.0.1:27017/yelp-camp';
+mongoose.connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+const db = mongoose.connection;
+// event 'open' menggunakan 'once' karena hanya perlu dipanggil sekali
+db.once('open', () => {
+    console.log('CONNECTION OPEN!!!');
+});
+// event 'error' menggunakan 'on' karena perlu dipanggil jika terjadi error
+db.on('error', err => {
+    console.log('OH NO ERROR!!!');
+    console.log(err);
+});
+
+//digunakan untuk set layouts pada dir views
+app.engine('ejs', ejsMate);
+//digunakan untuk mengatur engine yang digunakan untuk merender file view. Di sini kita menggunakan mesin EJS.
+app.set('view engine', 'ejs');
+//digunakan untuk mengatur direktori views yang akan digunakan. Di sini kita menggunakan direktori views yang berada di direktori root aplikasi.
+app.set('views', path.join(__dirname, 'views'))
+//parsing from html to req.body dan from json to req body
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ extended: true }));
+//route to campgrounds
+app.use('/campgrounds', campgrounds);
+//route to reviews
+app.use('/campgroundDetail/:id/reviews/', reviews);
+
+//route to home.ejs
+app.get('/', (req, res) => {
+    res.render('home');
+})
+
+//error route
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page Not Found', 404))
+})
+
+//error handler
+app.use((err, req, res, next) => {
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = 'Oh No, Something Went Wrong!';
+    res.status(statusCode).render('error', { err });
+})
+
+//listen to port 3000
+app.listen(3000, () => {
+    console.log('LISTENING ON PORT 3000')
+})
