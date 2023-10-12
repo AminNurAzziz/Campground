@@ -1,6 +1,6 @@
 # Campground
 
-Proyek "Campground" adalah aplikasi yang saya buat sebagai bagian dari pembelajaran saya tentang pengembangan back end menggunakan Express.js, MongoDB, dan Node.js. Aplikasi ini juga mencakup penerapan API kunci dari MapQuest untuk menyediakan informasi lokasi kepada pengguna...
+Proyek "Campground" adalah aplikasi yang saya buat sebagai bagian dari pembelajaran saya tentang pengembangan back end menggunakan Express.js, MongoDB, dan Node.js. Aplikasi ini juga mencakup penerapan API kunci dari MapQuest untuk menyediakan informasi lokasi kepada pengguna.
 
 ## Deskripsi
 
